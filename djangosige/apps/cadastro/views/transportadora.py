@@ -11,8 +11,7 @@ from .base import AdicionarPessoaView, PessoasListView, EditarPessoaView
 class AdicionarTransportadoraView(AdicionarPessoaView):
     template_name = "cadastro/pessoa_add.html"
     success_url = reverse_lazy('cadastro:listatransportadorasview')
-    success_message = """ Transportadora <b>%(nome_razao_social)s
-    </b>adicionada com sucesso."""
+    success_message = "Transportadora <b>%(nome_razao_social)s </b>adicionada com sucesso."
 
     def get_context_data(self, **kwargs):
         context = super(AdicionarTransportadoraView,
@@ -27,16 +26,13 @@ class AdicionarTransportadoraView(AdicionarPessoaView):
         form = TransportadoraForm(prefix='transportadora_form')
         veiculo_form = VeiculoFormSet(prefix='veiculo_form')
         veiculo_form.can_delete = False
-        return super(AdicionarTransportadoraView, self).get(
-            request, form, veiculo_form=veiculo_form, *args, **kwargs)
+        return super(AdicionarTransportadoraView, self).get(request, form, veiculo_form=veiculo_form, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = TransportadoraForm(
-            request.POST, request.FILES,
-            prefix='transportadora_form', request=request)
+            request.POST, request.FILES, prefix='transportadora_form', request=request)
         veiculo_form = VeiculoFormSet(request.POST, prefix='veiculo_form')
-        return super(AdicionarTransportadoraView, self).post(
-            request, form, veiculo_form=veiculo_form, *args, **kwargs)
+        return super(AdicionarTransportadoraView, self).post(request, form, veiculo_form=veiculo_form, *args, **kwargs)
 
 
 class TransportadorasListView(PessoasListView):
@@ -54,12 +50,10 @@ class TransportadorasListView(PessoasListView):
         return context
 
     def get_queryset(self):
-        return super(
-            TransportadorasListView, self).get_queryset(object=Transportadora)
+        return super(TransportadorasListView, self).get_queryset(object=Transportadora)
 
     def post(self, request, *args, **kwargs):
-        return super(
-            TransportadorasListView, self).post(request, Transportadora)
+        return super(TransportadorasListView, self).post(request, Transportadora)
 
 
 class EditarTransportadoraView(EditarPessoaView):
@@ -67,8 +61,7 @@ class EditarTransportadoraView(EditarPessoaView):
     model = Transportadora
     template_name = "cadastro/pessoa_edit.html"
     success_url = reverse_lazy('cadastro:listatransportadorasview')
-    success_message = """ Transportadora <b>%(nome_razao_social)s
-                            </b>editada com sucesso."""
+    success_message = "Transportadora <b>%(nome_razao_social)s </b>editada com sucesso."
 
     def get_context_data(self, **kwargs):
         context = super(EditarTransportadoraView,
@@ -86,23 +79,18 @@ class EditarTransportadoraView(EditarPessoaView):
 
         veiculo_form = VeiculoFormSet(
             instance=self.object, prefix='veiculo_form')
-        if Veiculo.objects.filter(
-                transportadora_veiculo=self.object.pk).count():
-                veiculo_form.extra = 0
+        if Veiculo.objects.filter(transportadora_veiculo=self.object.pk).count():
+            veiculo_form.extra = 0
 
-        return super(
-            EditarTransportadoraView, self).get(
-                request, form, veiculo_form=veiculo_form, *args, **kwargs)
+        return super(EditarTransportadoraView, self).get(request, form, veiculo_form=veiculo_form, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form_class = self.get_form_class()
         form = form_class(request.POST, request.FILES,
-                          prefix='transportadora_form',
-                          instance=self.object, request=request)
+                          prefix='transportadora_form', instance=self.object, request=request)
 
         veiculo_form = VeiculoFormSet(
             request.POST, prefix='veiculo_form', instance=self.object)
 
-        return super(EditarTransportadoraView, self).post(
-            request, form, veiculo_form=veiculo_form, *args, **kwargs)
+        return super(EditarTransportadoraView, self).post(request, form, veiculo_form=veiculo_form, *args, **kwargs)
