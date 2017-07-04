@@ -8,7 +8,6 @@ from djangosige.apps.financeiro.models import MovimentoCaixa
 
 from datetime import datetime
 
-
 class FluxoCaixaView(ListView):
     template_name = "financeiro/fluxo_de_caixa/fluxo.html"
     success_url = reverse_lazy('financeiro:fluxodecaixaview')
@@ -33,7 +32,8 @@ class FluxoCaixaView(ListView):
 
         except ValueError:
             data_final = data_inicial = datetime.today().strftime('%Y-%m-%d')
-            messages.error(
-                self.request, 'Formato de data incorreto, deve ser no formato DD/MM/AAAA')
+            messages.error(self.request, 'Formato de data incorreto, deve ser no formato DD/MM/AAAA')
 
         return MovimentoCaixa.objects.filter(data_movimento__range=(data_inicial, data_final))
+
+

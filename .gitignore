@@ -35,6 +35,4 @@ ArquivosXML/
 arquivos/
 setup.py
 djangosige/configs/configs.py
-.env
-.venv/
-*.sqlite3
+djangosige/media/imagens/usuarios/

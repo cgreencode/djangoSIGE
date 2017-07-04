@@ -9,7 +9,6 @@ from django.shortcuts import redirect
 from djangosige.apps.financeiro.models import PlanoContasGrupo, PlanoContasSubgrupo
 from djangosige.apps.financeiro.forms import PlanoContasGrupoForm, PlanoContasSubgrupoFormSet
 
-
 class PlanoContasView(TemplateView):
     template_name = "financeiro/plano/plano.html"
     success_url = reverse_lazy('financeiro:planocontasview')
@@ -29,10 +28,10 @@ class PlanoContasView(TemplateView):
         context['all_grupos_saida'] = grupo_saida
         return context
 
-    # Remover items selecionados da database
+    #Remover items selecionados da database
     def post(self, request, *args, **kwargs):
         for key, value in request.POST.items():
-            if value == 'on':
+            if value=='on':
                 grupo = None
                 subgrupo = False
                 tipo = None
@@ -47,22 +46,22 @@ class PlanoContasView(TemplateView):
                 tipo = instance.tipo_grupo
                 instance.delete()
 
-                # Reordenar codigos dos subgrupos
+                #Reordenar codigos dos subgrupos
                 if grupo and subgrupo:
-                    for i, obj in enumerate(PlanoContasSubgrupo.objects.filter(grupo=grupo), start=1):
+                    for i,obj in enumerate(PlanoContasSubgrupo.objects.filter(grupo=grupo), start=1):
                         obj.codigo = str(grupo.codigo) + '.' + str(i)
                         obj.save()
-                # Reordenar codigos dos grupos e subgrupos
+                #Reordenar codigos dos grupos e subgrupos
                 else:
                     id_list = []
                     for g in PlanoContasGrupo.objects.filter(tipo_grupo=tipo):
                         if not PlanoContasSubgrupo.objects.filter(id=g.id).count():
                             id_list.append(g.id)
 
-                    for i, obj in enumerate(PlanoContasGrupo.objects.filter(pk__in=id_list), start=1):
+                    for i,obj in enumerate(PlanoContasGrupo.objects.filter(pk__in=id_list), start=1):
                         obj.codigo = str(i)
                         obj.save()
-                        for j, subobj in enumerate(PlanoContasSubgrupo.objects.filter(grupo=obj), start=1):
+                        for j,subobj in enumerate(PlanoContasSubgrupo.objects.filter(grupo=obj), start=1):
                             subobj.codigo = str(obj.codigo) + '.' + str(j)
                             subobj.save()
 
@@ -91,15 +90,12 @@ class AdicionarGrupoPlanoContasView(CreateView):
         self.object = None
         form = PlanoContasGrupoForm(request.POST, prefix='grupo_form')
 
-        subgrupo_form = PlanoContasSubgrupoFormSet(
-            request.POST, prefix='subgrupo_form')
+        subgrupo_form = PlanoContasSubgrupoFormSet(request.POST, prefix='subgrupo_form')
 
         if (form.is_valid() and subgrupo_form.is_valid()):
             self.object = form.save(commit=False)
-            n_subgrupos = PlanoContasSubgrupo.objects.filter(
-                tipo_grupo=self.object.tipo_grupo).count()
-            n_grupos = PlanoContasGrupo.objects.filter(
-                tipo_grupo=self.object.tipo_grupo).count()
+            n_subgrupos = PlanoContasSubgrupo.objects.filter(tipo_grupo=self.object.tipo_grupo).count()
+            n_grupos = PlanoContasGrupo.objects.filter(tipo_grupo=self.object.tipo_grupo).count()
 
             self.object.codigo = n_grupos - n_subgrupos + 1
             self.object.save()
@@ -107,7 +103,7 @@ class AdicionarGrupoPlanoContasView(CreateView):
             subgrupo_form.instance = self.object
             objs = subgrupo_form.save()
 
-            for i, obj in enumerate(objs, start=1):
+            for i,obj in enumerate(objs, start=1):
                 obj.codigo = str(self.object.codigo) + '.' + str(i)
                 obj.tipo_grupo = self.object.tipo_grupo
                 obj.save()
@@ -118,8 +114,7 @@ class AdicionarGrupoPlanoContasView(CreateView):
 
     def form_valid(self, form):
         super(AdicionarGrupoPlanoContasView, self).form_valid(form)
-        messages.success(
-            self.request, self.get_success_message(form.cleaned_data))
+        messages.success(self.request, self.get_success_message(form.cleaned_data))
         return redirect(self.success_url)
 
     def form_invalid(self, form, subgrupo_form):
@@ -141,8 +136,7 @@ class EditarGrupoPlanoContasView(UpdateView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
-        subgrupo_form = PlanoContasSubgrupoFormSet(
-            instance=self.object, prefix='subgrupo_form')
+        subgrupo_form = PlanoContasSubgrupoFormSet(instance=self.object, prefix='subgrupo_form')
         subgrupos = PlanoContasSubgrupo.objects.filter(grupo=self.object)
 
         if len(subgrupos):
@@ -155,8 +149,7 @@ class EditarGrupoPlanoContasView(UpdateView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
-        subgrupo_form = PlanoContasSubgrupoFormSet(
-            request.POST, prefix='subgrupo_form', instance=self.object)
+        subgrupo_form = PlanoContasSubgrupoFormSet(request.POST, prefix='subgrupo_form', instance=self.object)
 
         if (form.is_valid() and subgrupo_form.is_valid()):
             self.object = form.save(commit=False)
@@ -165,7 +158,7 @@ class EditarGrupoPlanoContasView(UpdateView):
             subgrupo_form.instance = self.object
             objs = subgrupo_form.save()
 
-            for i, obj in enumerate(PlanoContasSubgrupo.objects.filter(grupo=self.object), start=1):
+            for i,obj in enumerate(PlanoContasSubgrupo.objects.filter(grupo=self.object), start=1):
                 obj.codigo = str(self.object.codigo) + '.' + str(i)
                 obj.tipo_grupo = self.object.tipo_grupo
                 obj.save()
@@ -176,8 +169,7 @@ class EditarGrupoPlanoContasView(UpdateView):
 
     def form_valid(self, form):
         super(EditarGrupoPlanoContasView, self).form_valid(form)
-        messages.success(
-            self.request, self.get_success_message(form.cleaned_data))
+        messages.success(self.request, self.get_success_message(form.cleaned_data))
         return redirect(self.success_url)
 
     def form_invalid(self, form, subgrupo_form):
