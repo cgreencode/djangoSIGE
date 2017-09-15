@@ -609,7 +609,7 @@ class ProcessadorNotaFiscal(object):
             else:
                 produto = Produto()
                 produto.descricao = str(det.prod.xProd.valor)
-                produto.codigo = str(det.prod.cProd.valor)
+                produto.codigo = str(det.prod.cProd.valor)[0:15]
                 produto.codigo_barras = str(det.prod.cEAN.valor)
                 produto.cest = str(det.prod.CEST.valor)
                 produto.origem = str(det.imposto.ICMS.orig.valor)
@@ -978,7 +978,7 @@ class ProcessadorNotaFiscal(object):
             else:
                 produto = Produto()
                 produto.descricao = str(det.prod.xProd.valor)
-                produto.codigo = str(det.prod.cProd.valor)
+                produto.codigo = str(det.prod.cProd.valor)[0:15]
                 produto.codigo_barras = str(det.prod.cEAN.valor)
                 produto.cest = str(det.prod.CEST.valor)
                 produto.origem = str(det.imposto.ICMS.orig.valor)
@@ -1194,16 +1194,12 @@ class ProcessadorNotaFiscal(object):
         else:
             processo = self.nova_nfe.gerar_xml(xml_nfe=nfe.xml, cert=self.info_certificado['cert'], key=self.info_certificado['key'],
                                                versao=nota_obj.versao, ambiente=int(nota_obj.tp_amb), estado=nota_obj.estado, consumidor=nota_obj.consumidor, caminho=MEDIA_ROOT)
-        temp_list = []
+
         for err in processo.envio.erros:
             e = ErrosValidacaoNotaFiscal(nfe=nota_obj)
             e.tipo = u'0'
-            err.replace("\\","")
-            elemento_xml = err.split("'")
-            if(array[1] not in temp_list):
-                temp_list.append(elemento_xml[1])
-                e.descricao = "Elemento: " + elemento_xml[1] + " Não foi preenchido ou está incorreto."
-                e.save()
+            e.descricao = err
+            e.save()
 
         for alerta in processo.envio.alertas:
             e = ErrosValidacaoNotaFiscal(nfe=nota_obj)
@@ -1215,12 +1211,8 @@ class ProcessadorNotaFiscal(object):
             for err_nf in nf.erros:
                 e = ErrosValidacaoNotaFiscal(nfe=nota_obj)
                 e.tipo = u'0'
-                err_nf.replace("\\", "")
-                elemento_xml = err_nf.split("'")
-                if (array[1] not in temp_list):
-                    temp_list.append(array[1])
-                    e.descricao = "Elemento: " + elemento_xml[1] + " Não foi preenchido ou está incorreto."
-                    e.save()
+                e.descricao = err_nf
+                e.save()
 
             for alerta_nf in nf.alertas:
                 e = ErrosValidacaoNotaFiscal(nfe=nota_obj)
